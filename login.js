@@ -1,4 +1,4 @@
-// login.js
+
 async function login() {
   this.error = '';
 

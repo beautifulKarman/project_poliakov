@@ -2,10 +2,6 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-<<<<<<< Updated upstream
-  <title>Моє Портфоліо</title>
-  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
-=======
   <title>Matrix Chat</title>
 
   <!-- CSP: дозволяємо CDN-скрипти і запити до matrix.org -->
@@ -19,66 +15,13 @@
   <!-- TailwindCSS & Alpine.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
->>>>>>> Stashed changes
 
-  <!-- Стилі каркасу й портфоліо -->
+  <!-- Підключення локальних модулів -->
+  <script src="./login.js"></script>
+  <script src="./sidebar.js"></script>
+  <script src="./chat.js"></script>
+
   <style>
-<<<<<<< Updated upstream
-    /* Основні стилі сторінки */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f0f2f5;
-    }
-
-    .container {
-      width: 90%;
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    h1, h2 {
-      color: #333;
-      border-bottom: 2px solid #007bff;
-      padding-bottom: 5px;
-    }
-
-    ul {
-      list-style-type: square;
-      margin-left: 20px;
-    }
-
-    /* Додаткові стилі для таблиці */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f2f2f2;
-      color: #555;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    tr:hover {
-      background-color: #eef6ff;
-    }
-=======
     .chat-container { min-height: 80vh; }
     .sidebar { min-width: 250px; }
     .chat-area { flex-grow: 1; }
@@ -101,75 +44,34 @@
     tr:hover{ background:#eef6ff; }
 
     [x-cloak]{ display:none !important; }
->>>>>>> Stashed changes
   </style>
-
-  <!-- Логіка компонентів -->
-  <script src="./login.js"></script>
-  <script src="./sidebar.js"></script>
 </head>
-<body>
-  <div class="container">
-    <h1>Моє портфоліо</h1>
-    <p>Вітаю! Це мій перший практичний проєкт в Electron.</p>
 
-<<<<<<< Updated upstream
-    <h2>Мої навички</h2>
-    <ul>
-      <li>HTML5 — Основи</li>
-      <li>CSS — Базові стилі</li>
-      <li>JavaScript — Початківець</li>
-      <li>Electron — Встановлення та запуск</li>
-    </ul>
-
-    <h2>Мої проєкти</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Назва проєкту</th>
-          <th>Технологія</th>
-          <th>Статус</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Перший додаток</td>
-          <td>Electron.js</td>
-          <td>В процесі</td>
-        </tr>
-        <tr>
-          <td>Портфоліо</td>
-          <td>HTML/CSS</td>
-          <td>Готово</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-=======
 <body class="bg-gray-100 flex items-center justify-center p-4">
   <div x-data="chatApp()" class="chat-container bg-white rounded-lg shadow-lg flex w-full max-w-5xl">
 
-    <!-- Сайдбар кімнат -->
+    <!-- Контейнер для сайдбару -->
     <div id="sidebar-container" class="sidebar"></div>
 
-    <!-- Основна область -->
+    <!-- Контейнер для основної області чату -->
     <div class="chat-area p-4 flex flex-col w-full">
-      <!-- Контейнер логіну -->
+      <!-- Контейнер для логіну -->
       <div id="login-container"></div>
 
-      <!-- Після авторизації: Matrix ID, резюме, портфоліо -->
+      <!-- Контейнер для чату -->
+      <div id="chat-container" class="chat-container"></div>
+
+      <!-- Панель користувача після авторизації (необов'язково, можна прибрати) -->
       <template x-if="accessToken">
-        <div>
+        <div class="mt-4">
           <h1 class="text-lg font-semibold mb-3">Ви успішно авторизувались. Ваша панель керування</h1>
 
           <div class="flex flex-col h-[550px]">
-            <!-- User ID -->
             <div class="mb-2 p-2 bg-gray-200 rounded text-sm break-words">
               <span class="font-bold">Your Matrix ID:</span>
               <span x-text="userId ? userId : 'Loading...'"></span>
             </div>
 
-            <!-- Резюме -->
             <div class="mb-3 p-3 border rounded">
               <h2 class="text-base font-semibold mb-2">Резюме</h2>
               <div class="grid grid-cols-1 gap-2 text-sm">
@@ -180,7 +82,6 @@
               </div>
             </div>
 
-            <!-- Портфоліо -->
             <div class="container overflow-auto">
               <h1>Моє портфоліо</h1>
               <p>Вітаю! Це мій перший практичний проєкт в Electron.</p>
@@ -216,54 +117,44 @@
                 </tbody>
               </table>
             </div>
-          </div><!-- /flex -->
+          </div>
         </div>
       </template>
     </div>
   </div>
 
-  <!-- Надійне підвантаження HTML-компонентів (fs -> fetch) -->
+  <!---END LOAD COMPONENT-->
+  <!-- Завантаження HTML-шаблонів після завантаження DOM -->
   <script>
-    function mountHtml(targetId, fileName) {
-      const slot = document.getElementById(targetId);
-      if (!slot) return;
-
-      // 1) Перший варіант: читаємо з диска (Electron renderer з nodeIntegration)
-      try {
-        const fs = require('fs');
-        const path = require('path');
-        const html = fs.readFileSync(path.join(__dirname, fileName), 'utf-8');
-        slot.innerHTML = html;
-        return;
-      } catch (e) {
-        console.warn('fs read failed for', fileName, e);
-      }
-
-      // 2) Fallback через fetch
-      fetch('./' + fileName)
+    document.addEventListener('DOMContentLoaded', () => {
+      // Завантаження login.html
+      fetch('./login.html')
         .then(r => r.text())
-        .then(html => slot.innerHTML = html)
-        .catch(err => {
-          console.error('Error loading', fileName, err);
-          slot.innerHTML = `<div class="text-red-600 p-3">Не вдалося завантажити ${fileName}</div>`;
-        });
-    }
+        .then(html => document.getElementById('login-container').innerHTML = html)
+        .catch(err => console.error('Error loading login:', err));
 
-    window.addEventListener('DOMContentLoaded', () => {
-      mountHtml('login-container', 'login.html');
-      mountHtml('sidebar-container', 'sidebar.html');
+      // Завантаження sidebar.html
+      fetch('./sidebar.html')
+        .then(r => r.text())
+        .then(html => document.getElementById('sidebar-container').innerHTML = html)
+        .catch(err => console.error('Error loading sidebar:', err));
+
+      // Завантаження chat.html
+      fetch('./chat.html')
+        .then(r => r.text())
+        .then(html => document.getElementById('chat-container').innerHTML = html)
+        .catch(err => console.error('Error loading chat:', err));
     });
+  </script>
 
-    /* ГОЛОВНИЙ СТАН */
+  <!-- Основна логіка AlpineJS: рівно як у твоєму зразку -->
+  <script>
     function chatApp() {
       return {
-        // auth
         username: '',
         password: '',
         accessToken: '',
         userId: '',
-
-        // rooms/messages
         roomId: '',
         joinRoomId: '',
         newRoomName: '',
@@ -272,45 +163,21 @@
         messages: [],
         newMessage: '',
         inviteUser: '',
+        error: '',
         lastSyncToken: '',
 
-        // misc
-        error: '',
-
-        // методи з компонентів
-        login,                // from login.js
-        createRoom,           // from sidebar.js
-        fetchRoomsWithNames,  // from sidebar.js
-
-        // допоміжні
-        switchRoom(id) {
-          if (!id) return;
-          this.roomId = id;
-          this.messages = [];
-          this.lastSyncToken = '';
-          this.fetchMessages();
-        },
-
-        async fetchMessages() { /* TODO: реалізуєш далі для області чату */ },
-
-        getRoomName(roomId) {
-          if (!roomId) return '';
-          const idx = roomId.indexOf(':');
-          return idx > -1 ? roomId.slice(0, idx) : roomId;
-        },
-
-        localizeError(msg) {
-          const m = ('' + msg).toUpperCase();
-          if (m.includes('FORBIDDEN') || m.includes('M_FORBIDDEN')) return 'Невірний логін або пароль.';
-          if (m.includes('UNAUTHORIZED') || m.includes('M_UNAUTHORIZED')) return 'Авторизація відхилена.';
-          if (m.includes('BAD JSON') || m.includes('M_BAD_JSON')) return 'Невірний формат запиту.';
-          if (m.includes('CAPTCHA')) return 'Потрібна CAPTCHA. Завершіть в офіційному клієнті.';
-          if (m.includes('RATE LIMIT') || m.includes('M_LIMIT_EXCEEDED')) return 'Забагато спроб. Зачекайте та повторіть.';
-          return 'Не вдалося увійти. Перевірте дані та спробуйте знову.';
-        }
+        // методи з підключених файлів (мають бути доступні глобально)
+        login,
+        createRoom,
+        fetchRoomsWithNames,
+        joinRoom,
+        inviteUserToRoom,
+        getRoomName,
+        switchRoom,
+        sendMessage,
+        fetchMessages
       }
     }
   </script>
->>>>>>> Stashed changes
 </body>
 </html>
