@@ -1,153 +1,73 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Matrix Chat</title>
-
-  <!-- CSP: дозволяємо CDN-скрипти і запити до matrix.org -->
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self' data:;
-                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com;
-                 style-src 'self' 'unsafe-inline';
-                 img-src 'self' data:;
-                 connect-src 'self' https://matrix.org;">
-
-  <!-- TailwindCSS & Alpine.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
-
-  <!-- Підключення локальних модулів -->
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="sidebar.css">
   <script src="./login.js"></script>
   <script src="./sidebar.js"></script>
   <script src="./chat.js"></script>
-
-  <style>
-    .chat-container { min-height: 80vh; }
-    .sidebar { min-width: 250px; }
-    .chat-area { flex-grow: 1; }
-    .message-input { min-height: 80px; }
-    .room-list li { padding: 8px; transition: background-color 0.2s; }
-    .room-list li:hover { background-color: #e0e7ff; }
-    .room-list li.active { background-color: #bfdbfe; font-weight: 500; }
-
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f2f5; }
-    .container {
-      width: 90%; max-width: 900px; margin: 20px auto; padding: 20px;
-      background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.05);
-    }
-    h1, h2 { color:#333; border-bottom: 2px solid #007bff; padding-bottom: 5px; }
-    ul { list-style-type: square; margin-left: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-    th { background:#f2f2f2; color:#555; }
-    tr:nth-child(even){ background:#f9f9f9; }
-    tr:hover{ background:#eef6ff; }
-
-    [x-cloak]{ display:none !important; }
-  </style>
+  <script src="./user.js"></script>
 </head>
-
-<body class="bg-gray-100 flex items-center justify-center p-4">
-  <div x-data="chatApp()" class="chat-container bg-white rounded-lg shadow-lg flex w-full max-w-5xl">
-
-    <!-- Контейнер для сайдбару -->
-    <div id="sidebar-container" class="sidebar"></div>
-
+<body class="index-container bg-gray-100 flex justify-center">
+  <div x-data="chatApp()" :class="accessToken ? '' : 'items-center'" class="flex w-full">
+    <!-- Контейнер для сайдбару з кімнатами -->
+    <div id="sidebar-container"></div>
+    
     <!-- Контейнер для основної області чату -->
-    <div class="chat-area p-4 flex flex-col w-full">
+    <div class="chat-area p-4 flex flex-col flex-1">
       <!-- Контейнер для логіну -->
       <div id="login-container"></div>
-
+      
       <!-- Контейнер для чату -->
-      <div id="chat-container" class="chat-container"></div>
-
-      <!-- Панель користувача після авторизації (необов'язково, можна прибрати) -->
-      <template x-if="accessToken">
-        <div class="mt-4">
-          <h1 class="text-lg font-semibold mb-3">Ви успішно авторизувались. Ваша панель керування</h1>
-
-          <div class="flex flex-col h-[550px]">
-            <div class="mb-2 p-2 bg-gray-200 rounded text-sm break-words">
-              <span class="font-bold">Your Matrix ID:</span>
-              <span x-text="userId ? userId : 'Loading...'"></span>
-            </div>
-
-            <div class="mb-3 p-3 border rounded">
-              <h2 class="text-base font-semibold mb-2">Резюме</h2>
-              <div class="grid grid-cols-1 gap-2 text-sm">
-                <div><span class="font-semibold">Ім’я:</span> Дмитро (приклад)</div>
-                <div><span class="font-semibold">Роль:</span> Junior Frontend / Electron</div>
-                <div><span class="font-semibold">Email:</span> your.email@example.com</div>
-                <div><span class="font-semibold">Навички:</span> HTML5, CSS, Tailwind, Alpine.js, Electron, Python (Pandas)</div>
-              </div>
-            </div>
-
-            <div class="container overflow-auto">
-              <h1>Моє портфоліо</h1>
-              <p>Вітаю! Це мій перший практичний проєкт в Electron.</p>
-
-              <h2>Мої навички</h2>
-              <ul>
-                <li>HTML5 — Основи</li>
-                <li>CSS — Базові стилі</li>
-                <li>JavaScript — Початківець</li>
-                <li>Electron — Встановлення та запуск</li>
-              </ul>
-
-              <h2>Мої проєкти</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Назва проєкту</th>
-                    <th>Технологія</th>
-                    <th>Статус</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Перший додаток</td>
-                    <td>Electron.js</td>
-                    <td>В процесі</td>
-                  </tr>
-                  <tr>
-                    <td>Портфоліо</td>
-                    <td>HTML/CSS</td>
-                    <td>Готово</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </template>
+      <div id="chat-container" class="chat-container flex-1"></div>
     </div>
+    
+    <!-- Контейнер для користувачів -->
+    <div id="user-container"></div>
   </div>
 
-  <!---END LOAD COMPONENT-->
-  <!-- Завантаження HTML-шаблонів після завантаження DOM -->
   <script>
+    // Завантаження HTML-шаблонів після завантаження DOM
     document.addEventListener('DOMContentLoaded', () => {
       // Завантаження login.html
       fetch('./login.html')
-        .then(r => r.text())
-        .then(html => document.getElementById('login-container').innerHTML = html)
-        .catch(err => console.error('Error loading login:', err));
-
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('login-container').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading login:', error));
+      
       // Завантаження sidebar.html
       fetch('./sidebar.html')
-        .then(r => r.text())
-        .then(html => document.getElementById('sidebar-container').innerHTML = html)
-        .catch(err => console.error('Error loading sidebar:', err));
-
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('sidebar-container').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading sidebar:', error));
+      
       // Завантаження chat.html
       fetch('./chat.html')
-        .then(r => r.text())
-        .then(html => document.getElementById('chat-container').innerHTML = html)
-        .catch(err => console.error('Error loading chat:', err));
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('chat-container').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading chat:', error));
+      
+      // Завантаження user.html
+      fetch('./user.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('user-container').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading user:', error));
     });
   </script>
 
-  <!-- Основна логіка AlpineJS: рівно як у твоєму зразку -->
   <script>
     function chatApp() {
       return {
@@ -165,8 +85,7 @@
         inviteUser: '',
         error: '',
         lastSyncToken: '',
-
-        // методи з підключених файлів (мають бути доступні глобально)
+        roomMembers: [],
         login,
         createRoom,
         fetchRoomsWithNames,
@@ -175,7 +94,8 @@
         getRoomName,
         switchRoom,
         sendMessage,
-        fetchMessages
+        fetchMessages,
+        fetchRoomMembers
       }
     }
   </script>

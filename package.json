@@ -1,15 +1,15 @@
 {
-  "name": "project_2_3",
+  "name": "matrix-chat-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "Chat application with Matrix authentication",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["electron", "chat", "matrix"],
+  "author": "Your Name",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^38.3.0"
+    "electron": "^31.0.1"
   }
 }

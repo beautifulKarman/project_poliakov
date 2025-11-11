@@ -1,36 +1,9 @@
 <template x-if="!accessToken">
-  <!-- Центрування контейнера -->
-  <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="w-full max-w-sm bg-white rounded-xl shadow-lg p-6">
-      <h2 class="text-2xl font-semibold text-center mb-4 text-gray-700">Login</h2>
-
-      <input
-        x-model="username"
-        @input="error=''"
-        placeholder="Username (e.g., @user:matrix.org)"
-        class="border p-2 w-full mb-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-
-      <input
-        x-model="password"
-        type="password"
-        @input="error=''"
-        placeholder="Password"
-        class="border p-2 w-full mb-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-
-      <button
-        @click="login()"
-        class="bg-blue-500 text-white p-2 w-full rounded hover:bg-blue-600 transition"
-      >
-        Login
-      </button>
-
-      <p
-        x-show="error"
-        x-text="error"
-        class="text-red-500 text-sm mt-3 text-center"
-      ></p>
-    </div>
+  <div>
+    <h2 class="text-xl font-bold mb-4">Login</h2>
+    <input x-model="username" placeholder="Username (e.g., @user:matrix.org)" class="border p-2 w-full mb-2 rounded">
+    <input x-model="password" type="password" placeholder="Password" class="border p-2 w-full mb-2 rounded">
+    <button @click="login()" class="bg-blue-500 text-white p-2 w-full rounded hover:bg-blue-600 transition">Login</button>
+    <p x-text="error" class="text-red-500 mt-2"></p>
   </div>
 </template>
