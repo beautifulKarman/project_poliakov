@@ -67,7 +67,6 @@ async function fetchRoomMembers() {
       }
     );
     const data = await res.json();
-    // data.joined — об'єкт { "@user:matrix.org": { display_name: "...", avatar_url: "..." } }
     this.roomMembers = Object.entries(data.joined || {}).map(([userId, info]) => ({
       userId,
       displayName: info.display_name || userId.split(':')[0].substring(1),
@@ -101,10 +100,9 @@ async function kickUser(userId) {
     const data = await res.json();
 
     if (res.ok) {
-      // Успішно викинуто
       this.roomMembers = this.roomMembers.filter(m => m.userId !== userId);
       alert(`Користувач ${userId} викинутий з кімнати.`);
-      await this.fetchRoomMembers(); // Оновлюємо список
+      await this.fetchRoomMembers();
     } else {
       console.error('Kick failed:', data);
       alert('Не вдалося викинути користувача: ' + (data.error || 'Невідома помилка'));

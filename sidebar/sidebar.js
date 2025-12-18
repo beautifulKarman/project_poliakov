@@ -111,7 +111,7 @@ async function leaveRoom(roomId) {
       }
 
       alert('Кімнату покинуто.');
-      await this.fetchRoomsWithNames(); // Оновлюємо список
+      await this.fetchRoomsWithNames();
     } else {
       console.error('Leave failed:', data);
       alert('Не вдалося покинути кімнату: ' + (data.error || 'Невідома помилка'));
