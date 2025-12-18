@@ -5,28 +5,22 @@
   <title>Matrix Chat</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
-  <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="login.css">
-  <link rel="stylesheet" href="sidebar.css">
-  <script src="./login.js"></script>
-  <script src="./sidebar.js"></script>
-  <script src="./chat.js"></script>
-  <script src="./user.js"></script>
+  <script src="login/login.js"></script>
+  <script src="sidebar/sidebar.js"></script>
+  <script src="chat/chat.js"></script>
+  <script src="user/user.js"></script>
 </head>
-<body class="index-container bg-gray-100 flex justify-center">
-  <div x-data="chatApp()" :class="accessToken ? '' : 'items-center'" class="flex w-full">
-    <!-- Контейнер для сайдбару з кімнатами -->
+<body class="bg-gray-100 flex items-center justify-center p-4">
+  <div x-data="chatApp()" class="chat-container bg-white rounded-lg shadow-lg flex w-full max-w-5xl">
+    <!-- Контейнер для сайдбару-->
     <div id="sidebar-container"></div>
-    
     <!-- Контейнер для основної області чату -->
     <div class="chat-area p-4 flex flex-col flex-1">
       <!-- Контейнер для логіну -->
       <div id="login-container"></div>
-      
       <!-- Контейнер для чату -->
       <div id="chat-container" class="chat-container flex-1"></div>
     </div>
-    
     <!-- Контейнер для користувачів -->
     <div id="user-container"></div>
   </div>
@@ -35,40 +29,158 @@
     // Завантаження HTML-шаблонів після завантаження DOM
     document.addEventListener('DOMContentLoaded', () => {
       // Завантаження login.html
-      fetch('./login.html')
+      fetch('login/login.html')
         .then(response => response.text())
         .then(html => {
           document.getElementById('login-container').innerHTML = html;
         })
         .catch(error => console.error('Error loading login:', error));
-      
       // Завантаження sidebar.html
-      fetch('./sidebar.html')
+      fetch('sidebar/sidebar.html')
         .then(response => response.text())
         .then(html => {
           document.getElementById('sidebar-container').innerHTML = html;
         })
         .catch(error => console.error('Error loading sidebar:', error));
-      
       // Завантаження chat.html
-      fetch('./chat.html')
+      fetch('chat/chat.html')
         .then(response => response.text())
         .then(html => {
           document.getElementById('chat-container').innerHTML = html;
         })
         .catch(error => console.error('Error loading chat:', error));
-      
       // Завантаження user.html
-      fetch('./user.html')
+      fetch('user/user.html')
         .then(response => response.text())
         .then(html => {
           document.getElementById('user-container').innerHTML = html;
         })
         .catch(error => console.error('Error loading user:', error));
     });
+
+    // Запитуємо дозвіл при першому вході
+    document.addEventListener('DOMContentLoaded', () => {
+      if (Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    });
   </script>
 
   <script>
+    function startEdit(messageId, currentBody) {
+      this.editMode = messageId;
+      this.editText = currentBody;
+      this.$nextTick(() => {
+        const textarea = document.querySelector(`[x-show="editMode === '${messageId}'"] textarea`);
+        if (textarea) textarea.focus();
+      });
+    }
+
+    function cancelEdit() {
+      this.editMode = null;
+      this.editText = '';
+    }
+
+    async function saveEdit(messageId) {
+      if (!this.editText.trim()) return;
+
+      try {
+        const res = await fetch(
+          `https://matrix.org/_matrix/client/r0/rooms/${this.roomId}/send/m.room.message`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${this.accessToken}`
+            },
+            body: JSON.stringify({
+              msgtype: 'm.text',
+              body: this.editText.trim(),
+              "m.new_content": {
+                body: this.editText.trim(),
+                msgtype: 'm.text'
+              },
+              "m.relates_to": {
+                rel_type: "m.replace",
+                event_id: messageId
+              }
+            })
+          }
+        );
+
+        const data = await res.json();
+        if (data.event_id) {
+          // Оновлюємо локально
+          const msg = this.messages.find(m => m.id === messageId);
+          if (msg) {
+            msg.body = this.editText.trim();
+            msg.edited = true;
+          }
+          this.cancelEdit();
+        } else {
+          alert('Помилка редагування: ' + (data.error || ''));
+        }
+      } catch (e) {
+        console.error('Edit error:', e);
+        alert('Помилка: ' + e.message);
+      }
+    }
+
+    async function deleteMessage(messageId) {
+      if (!confirm('Видалити повідомлення?')) return;
+
+      try {
+        const res = await fetch(
+          `https://matrix.org/_matrix/client/r0/rooms/${this.roomId}/redact/${messageId}`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`
+            }
+          }
+        );
+
+        if (res.ok) {
+          this.messages = this.messages.filter(m => m.id !== messageId);
+        } else {
+          const data = await res.json();
+          alert('Не вдалося видалити: ' + (data.error || ''));
+        }
+      } catch (e) {
+        console.error('Delete error:', e);
+        alert('Помилка: ' + e.message);
+      }
+    }
+
+    function playNotificationSound() {
+      const audio = new Audio('chat/assets/ping.mp3');
+      audio.volume = 0.5; // 50% гучності
+      audio.play().catch(e => console.log('Sound blocked:', e));
+    }
+
+    function showDesktopNotification(sender, body) {
+      if (Notification.permission !== 'granted') return;
+
+      const title = sender === this.userId ? 'Ти' : sender.split(':')[0].substring(1);
+      const options = {
+        body: body.length > 100 ? body.substring(0, 97) + '...' : body,
+        icon: './assets/icon.png', // опціонально: додай іконку
+        tag: 'matrix-chat',        // уникає дублювання
+        renotify: true
+      };
+
+      const notification = new Notification(title, options);
+
+      // Закриваємо через 5 сек
+      setTimeout(() => notification.close(), 5000);
+
+      // Клік по сповіщенню → фокус на вкладку
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+    }
+
     function chatApp() {
       return {
         username: '',
@@ -82,6 +194,8 @@
         rooms: [],
         messages: [],
         newMessage: '',
+        editText: '',
+        editMode: null,
         inviteUser: '',
         error: '',
         lastSyncToken: '',
@@ -97,7 +211,13 @@
         fetchMessages,
         fetchRoomMembers,
         leaveRoom,
-        kickUser
+        kickUser,
+        startEdit,
+        cancelEdit,
+        saveEdit,
+        deleteMessage,
+        playNotificationSound,
+        showDesktopNotification
       }
     }
   </script>

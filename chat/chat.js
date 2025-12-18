@@ -16,7 +16,12 @@ async function sendMessage() {
     });
     const data = await res.json();
     if (data.event_id) {
-      this.messages.push({ id: data.event_id, body: msg, sender: this.userId });
+      this.messages.push({ 
+        id: data.event_id, 
+        body: msg, 
+        sender: this.userId,
+        edited: false 
+      });
     } else {
       console.error('Send failed:', data);
     }
@@ -41,11 +46,24 @@ async function fetchMessages() {
         const roomData = data.rooms.join[this.roomId];
         roomData.timeline?.events?.forEach(event => {
           if (event.type === 'm.room.message' && !this.messages.find(m => m.id === event.event_id)) {
-            this.messages.push({
+            const newMsg = {
               id: event.event_id,
               body: event.content.body,
-              sender: event.sender
-            });
+              sender: event.sender,
+              edited: false
+            };
+            this.messages.push(newMsg);
+
+            // Сповіщення + звук, ТІЛЬКИ якщо:
+            // 1. Повідомлення НЕ від мене
+            // 2. Вкладка НЕ активна або кімната НЕ відкрита
+            if (
+              event.sender !== this.userId &&
+              (document.hidden || this.roomId !== this.roomId) // document.hidden = вкладка в фоні
+            ) {
+              this.showDesktopNotification(event.sender, event.content.body);
+              this.playNotificationSound();
+            }
           }
         });
       }
